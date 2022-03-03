@@ -1,5 +1,6 @@
 package ca.solostudios.kspservice.processor
 
+import ca.solostudios.kspservice.annotation.Service
 import com.google.devtools.ksp.closestClassDeclaration
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.isLocal
@@ -14,10 +15,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.ClassName
-import ca.solostudios.kspservice.annotation.Service
 import java.io.IOException
 
-class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : SymbolProcessor {
+internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val codeGenerator = environment.codeGenerator
     private val logger = environment.logger
     
@@ -106,7 +106,7 @@ class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
                 
                 else                                                             -> {
                     val serviceImplementors = services[serviceDeclaration.toBinaryName()]
-                                              ?: mutableSetOf<String>().also { services[serviceDeclaration.toBinaryName()] = it }
+                        ?: mutableSetOf<String>().also { services[serviceDeclaration.toBinaryName()] = it }
                     
                     serviceImplementors.add(serviceImplementation.toBinaryName())
                     
@@ -146,8 +146,8 @@ class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : SymbolProce
     }
     
     private fun KSPLogger.verbose(message: String) {
-        // if (verbose)
-        logging(message)
+        if (verbose)
+            logging(message)
     }
     
     private fun KSClassDeclaration.failsServiceVerification(serviceType: KSType): Boolean {
