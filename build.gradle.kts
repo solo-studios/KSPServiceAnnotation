@@ -57,6 +57,10 @@ val sourcesJar by tasks.creating(Jar::class) {
     from(sourceSets["main"].allSource)
 }
 
+tasks.build {
+    dependsOn(tasks.withType<Jar>())
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
