@@ -9,7 +9,6 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
@@ -173,9 +172,5 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
     
     companion object {
         val SERVICE_ANNOTATION_NAME = Service::class.qualifiedName!!
-    }
-    
-    class Provider : SymbolProcessorProvider {
-        override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor = KSPServiceProcessor(environment)
     }
 }

@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "ca.solo-studios"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -29,7 +29,6 @@ dependencies {
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.7")
     testImplementation("com.google.devtools.ksp:symbol-processing:1.6.10-1.0.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    
 }
 
 tasks.test {
