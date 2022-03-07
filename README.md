@@ -31,8 +31,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly 'ca.solo-studios:ksp-service-annotation:1.0.0'
-    ksp 'ca.solo-studios:ksp-service-annotation:1.0.0'
+    compileOnly 'ca.solo-studios:ksp-service-annotation:1.0.1'
+    ksp 'ca.solo-studios:ksp-service-annotation:1.0.1'
 }
 ```
 
@@ -44,7 +44,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly("ca.solo-studios:ksp-service-annotation:1.0.0")
-    ksp("ca.solo-studios:ksp-service-annotation:1.0.0")
+    compileOnly("ca.solo-studios:ksp-service-annotation:1.0.1")
+    ksp("ca.solo-studios:ksp-service-annotation:1.0.1")
 }
 ```
