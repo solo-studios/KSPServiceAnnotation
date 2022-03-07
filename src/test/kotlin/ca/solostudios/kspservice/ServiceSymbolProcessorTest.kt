@@ -1,12 +1,12 @@
 package ca.solostudios.kspservice
 
+import ca.solostudios.kspservice.processor.KSPServiceProcessorProvider
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.KotlinCompilation.ExitCode
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
-import ca.solostudios.kspservice.processor.KSPServiceProcessor
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.io.File
@@ -32,7 +32,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -65,7 +65,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = listOf(source)
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -130,7 +130,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = sourceFiles
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -183,7 +183,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = sourceFiles
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -224,7 +224,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = sourceFiles
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -252,7 +252,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = sourceFiles
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
@@ -287,7 +287,7 @@ class ServiceSymbolProcessorTest {
         val compilation = KotlinCompilation().apply {
             sources = sourceFiles
             inheritClassPath = true
-            symbolProcessorProviders = listOf(KSPServiceProcessor.Provider())
+            symbolProcessorProviders = listOf(KSPServiceProcessorProvider())
             kspIncremental = incremental
         }
         val result = compilation.compile()
