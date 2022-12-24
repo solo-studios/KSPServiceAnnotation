@@ -24,7 +24,7 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
     private val serviceFiles: MutableMap<String, KSFile> = mutableMapOf()
     
     private val verify = environment.options["kspservice.verify"].toBoolean()
-    private val verbose = environment.options["kspservice.verify"].toBoolean()
+    private val verbose = environment.options["kspservice.verbose"].toBoolean()
     
     /**
      * - For each class annotated with [Service]
@@ -45,7 +45,6 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
         }
         
         resolver.getSymbolsWithAnnotation(SERVICE_ANNOTATION_NAME)
-                .asSequence()
                 .filterIsInstance<KSClassDeclaration>()
                 .forEach { serviceClassDeclaration ->
                     val annotation = serviceClassDeclaration.annotations.find { it.annotationType.resolve() == serviceType }
