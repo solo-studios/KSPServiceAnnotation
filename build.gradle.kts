@@ -1,58 +1,72 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
     signing
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.5.0"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.dokka") version "1.7.20"
 }
 
 group = "ca.solo-studios"
-version = "1.0.1"
+version = "1.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+kotlin {
+    target.compilations.configureEach {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            apiVersion = "1.7"
+            languageVersion = "1.7"
+        }
+    }
+}
+
 dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.6.10-1.0.2")
-    implementation("com.squareup:kotlinpoet:1.10.2")
+    val kspVersion = "1.7.20-1.0.7"
+    implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
+    
+    val kotlinPoetVersion = "1.12.0"
+    implementation("com.squareup:kotlinpoet:$kotlinPoetVersion")
     
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
     testImplementation(kotlin("compiler-embeddable"))
     testImplementation(kotlin("scripting-compiler-embeddable"))
     
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.7")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.7")
-    testImplementation("com.google.devtools.ksp:symbol-processing:1.6.10-1.0.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    val kotlinCompileTestingVersion = "1.4.9"
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTestingVersion")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:$kotlinCompileTestingVersion")
+    testImplementation("com.google.devtools.ksp:symbol-processing:$kspVersion")
+    
+    val junitJupiterVersion = "5.9.1"
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 val dokkaHtml by tasks.getting(DokkaTask::class)
 
-val javadoc by tasks.getting(Javadoc::class)
-
-val jar by tasks.getting(Jar::class)
-
-val javadocJar by tasks.creating(Jar::class) {
+val javadocJar by tasks.getting(Jar::class) {
     dependsOn(dokkaHtml)
     archiveClassifier.set("javadoc")
     from(dokkaHtml.outputDirectory)
 }
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.getting(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
 }
@@ -64,9 +78,7 @@ tasks.build {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifact(sourcesJar)
-            artifact(javadocJar)
-            artifact(jar)
+            from(components["java"])
             
             version = version as String
             groupId = group as String
@@ -108,13 +120,23 @@ publishing {
     
     repositories {
         maven {
-            name = "sonatypeStaging"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
-            credentials(org.gradle.api.credentials.PasswordCredentials::class)
+            name = "SonatypeStaging"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials(PasswordCredentials::class)
         }
         maven {
-            name = "sonatypeSnapshot"
+            name = "SonatypeSnapshot"
             url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            credentials(PasswordCredentials::class)
+        }
+        maven {
+            name = "SoloStudiosRelease"
+            url = uri("https://maven.solo-studios.ca/release/")
+            credentials(PasswordCredentials::class)
+        }
+        maven {
+            name = "SoloStudiosSnapshot"
+            url = uri("https://maven.solo-studios.ca/snapshot/")
             credentials(PasswordCredentials::class)
         }
     }
