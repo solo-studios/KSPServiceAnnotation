@@ -133,11 +133,17 @@ publishing {
             name = "SoloStudiosRelease"
             url = uri("https://maven.solo-studios.ca/release/")
             credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
         }
         maven {
             name = "SoloStudiosSnapshot"
             url = uri("https://maven.solo-studios.ca/snapshot/")
             credentials(PasswordCredentials::class)
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
         }
     }
 }
