@@ -121,11 +121,6 @@ publishing {
     
     repositories {
         maven {
-            name = "SonatypeStaging"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials(PasswordCredentials::class)
-        }
-        maven {
             name = "Sonatype"
             url = if (!isSnapshot)
                 uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") // releases repo
@@ -135,7 +130,7 @@ publishing {
             credentials(PasswordCredentials::class)
         }
         maven {
-            name = "SoloStudiosRelease"
+            name = "SoloStudios"
             url = if (!isSnapshot)
                 uri("https://maven.solo-studios.ca/releases/")
             else
