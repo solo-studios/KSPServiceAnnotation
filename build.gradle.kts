@@ -5,9 +5,13 @@ plugins {
     signing
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.dokka") version "1.7.20"
-    id("pl.allegro.tech.build.axion-release") version "1.14.3"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.axion.release)
+    // kotlin("jvm") version "1.7.20"
+    // id("org.jetbrains.dokka") version "1.7.20"
+    // id("pl.allegro.tech.build.axion-release") version "1.14.3"
 }
 
 group = "ca.solo-studios"
@@ -33,29 +37,20 @@ kotlin {
 }
 
 dependencies {
-    val kspVersion = "1.7.20-1.0.7"
-    implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
+    implementation(libs.kotlin.ksp.api)
     
-    val kotlinPoetVersion = "1.12.0"
-    implementation("com.squareup:kotlinpoet:$kotlinPoetVersion")
+    implementation(libs.bundles.kotlinpoet)
     
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("script-runtime"))
-    testImplementation(kotlin("compiler-embeddable"))
-    testImplementation(kotlin("scripting-compiler-embeddable"))
     
-    val kotlinCompileTestingVersion = "1.4.9"
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTestingVersion")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:$kotlinCompileTestingVersion")
-    testImplementation("com.google.devtools.ksp:symbol-processing:$kspVersion")
+    testImplementation(libs.bundles.junit)
     
-    val junitJupiterVersion = "5.9.1"
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
+    testImplementation(libs.kotlin.ksp.base)
+    testImplementation(libs.bundles.kotlin.testing)
+    testImplementation(libs.bundles.kotlin.scripting)
 }
 
 tasks.test {
+    // enabled = false
     useJUnitPlatform()
 }
 

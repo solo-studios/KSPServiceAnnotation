@@ -1,0 +1,73 @@
+[versions]
+kotlin = "1.7.20"
+ksp = "1.7.20-1.0.8"
+#dokka = "1.7.20" # usually the same as kotlin version
+junit-jupiter = "5.9.1"
+kotlinpoet = "1.12.0"
+axiom-release = "1.14.3"
+kotlin-compile-testing = "1.4.9"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin" }
+
+axion-release = { id = "pl.allegro.tech.build.axion-release", version.ref = "axiom-release" }
+
+[libraries]
+
+# Kotlin stdlib
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+
+# Kotlin Scripting (+Compiler)
+kotlin-scripting-runtime = { group = "org.jetbrains.kotlin", name = "kotlin-script-runtime", version.ref = "kotlin" }
+kotlin-compiler-embeddable = { group = "org.jetbrains.kotlin", name = "kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-scripting-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
+
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+
+kotlin-compile-testing-base = { group = "com.github.tschuchortdev", name = "kotlin-compile-testing", version.ref = "kotlin-compile-testing" }
+kotlin-compile-testing-ksp = { group = "com.github.tschuchortdev", name = "kotlin-compile-testing-ksp", version.ref = "kotlin-compile-testing" }
+
+# KSP
+## Kotlin Symbol Processing library
+kotlin-ksp-api = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
+kotlin-ksp-base = { group = "com.google.devtools.ksp", name = "symbol-processing", version.ref = "ksp" }
+
+# Kotlin Poet
+## KotlinPoet is a Kotlin and Java API for generating .kt source files
+kotlinpoet-base = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinpoet" }
+kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version.ref = "kotlinpoet" }
+
+# JUnit
+## Unit testing framework for Java
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit-jupiter" }
+
+[bundles]
+
+kotlinpoet = [
+    "kotlinpoet-base",
+    "kotlinpoet-ksp",
+]
+
+junit = [
+    "junit-jupiter-api",
+    "junit-jupiter-engine",
+    "junit-jupiter-params",
+]
+
+kotlin-testing = [
+    "kotlin-test",
+    "kotlin-compile-testing-base",
+    "kotlin-compile-testing-ksp",
+]
+
+kotlin-scripting = [
+    "kotlin-scripting-runtime",
+    "kotlin-compiler-embeddable",
+    "kotlin-scripting-compiler",
+]
