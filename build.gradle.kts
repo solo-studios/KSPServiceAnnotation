@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "ca.solo-studios"
-version = "1.0.2"
+version = scmVersion.version
 
 repositories {
     mavenCentral()
@@ -131,23 +131,23 @@ publishing {
             credentials(PasswordCredentials::class)
         }
         maven {
-            name = "SonatypeSnapshot"
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            name = "Sonatype"
+            url = if (!isSnapshot)
+                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") // releases repo
+            else
+                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") // snapshot repo
+    
             credentials(PasswordCredentials::class)
         }
         maven {
             name = "SoloStudiosRelease"
-            url = uri("https://maven.solo-studios.ca/release/")
+            url = if (!isSnapshot)
+                uri("https://maven.solo-studios.ca/releases/")
+            else
+                uri("https://maven.solo-studios.ca/snapshots/")
+    
             credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
-        }
-        maven {
-            name = "SoloStudiosSnapshot"
-            url = uri("https://maven.solo-studios.ca/snapshot/")
-            credentials(PasswordCredentials::class)
-            authentication {
+            authentication { // publishing doesn't work without this for some reason
                 create<BasicAuthentication>("basic")
             }
         }
@@ -156,5 +156,8 @@ publishing {
 
 signing {
     useGpgCmd()
-    sign(publishing.publications["maven"])
+    sign(publishing.publications)
 }
+
+val isSnapshot: Boolean
+    get() = version.toString().endsWith("-SNAPSHOT")
