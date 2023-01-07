@@ -9,9 +9,6 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.axion.release)
-    // kotlin("jvm") version "1.7.20"
-    // id("org.jetbrains.dokka") version "1.7.20"
-    // id("pl.allegro.tech.build.axion-release") version "1.14.3"
 }
 
 group = "ca.solo-studios"
