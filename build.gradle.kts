@@ -7,6 +7,7 @@ plugins {
     `maven-publish`
     kotlin("jvm") version "1.7.20"
     id("org.jetbrains.dokka") version "1.7.20"
+    id("pl.allegro.tech.build.axion-release") version "1.14.3"
 }
 
 group = "ca.solo-studios"
@@ -85,12 +86,17 @@ publishing {
             artifactId = "ksp-service-annotation"
             
             pom {
+                val projectOrg = "solo-studios"
+                val projectRepo = "KSPServiceAnnotation"
+                val githubBaseUri = "github.com/$projectOrg/$projectRepo"
+                val githubUrl = "https://$githubBaseUri"
+    
                 name.set("KSP Service Annotation")
                 description.set("A KSP Annotation processor to automatically create the required files in META-INF/services for services.")
-                url.set("https://github.com/solo-studios/KSPServiceAnnotation")
-                
+                url.set(githubUrl)
+    
                 inceptionYear.set("2021")
-                
+    
                 licenses {
                     license {
                         name.set("Apache License 2.0")
@@ -107,12 +113,12 @@ publishing {
                 }
                 issueManagement {
                     system.set("GitHub")
-                    url.set("https://github.com/solo-studios/KSPServiceAnnotation/issues")
+                    url.set("$githubUrl/issues")
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/solo-studios/KSPServiceAnnotation.git")
-                    developerConnection.set("scm:git:ssh://github.com/solo-studios/KSPServiceAnnotation.git")
-                    url.set("https://github.com/solo-studios/KSPServiceAnnotation/")
+                    connection.set("scm:git:$githubUrl.git")
+                    developerConnection.set("scm:git:ssh://$githubBaseUri.git")
+                    url.set(githubUrl)
                 }
             }
         }
