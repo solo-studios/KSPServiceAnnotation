@@ -119,19 +119,19 @@ publishing {
     repositories {
         maven {
             name = "Sonatype"
-            url = if (!isSnapshot)
-                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") // releases repo
-            else
-                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") // snapshot repo
+    
+            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") // releases repo
+            val snapshotUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") // snapshot repo
+            url = if (isSnapshot) snapshotUrl else releasesUrl
     
             credentials(PasswordCredentials::class)
         }
         maven {
             name = "SoloStudios"
-            url = if (!isSnapshot)
-                uri("https://maven.solo-studios.ca/releases/")
-            else
-                uri("https://maven.solo-studios.ca/snapshots/")
+    
+            val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
+            val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
+            url = if (isSnapshot) snapshotUrl else releasesUrl
     
             credentials(PasswordCredentials::class)
             authentication { // publishing doesn't work without this for some reason
