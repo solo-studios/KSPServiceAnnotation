@@ -1,6 +1,6 @@
 [versions]
-kotlin = "1.7.20"
-ksp = "1.7.20-1.0.8"
+kotlin = "1.7.21"
+ksp = "1.7.21-1.0.8"
 dokka = "1.7.20"
 junit-jupiter = "5.11.3"
 kotlinpoet = "1.14.0"
