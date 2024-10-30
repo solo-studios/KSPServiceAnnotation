@@ -1,11 +1,11 @@
 [versions]
-kotlin = "1.8.20"
-ksp = "1.8.20-1.0.11"
-dokka = "1.8.20"
+kotlin = "1.9.20"
+ksp = "1.9.20-1.0.14"
+dokka = "1.9.20"
 junit-jupiter = "5.11.3"
-kotlinpoet = "1.14.0"
+kotlinpoet = "1.17.0"
 axiom-release = "1.14.3"
-kotlin-compile-testing = "1.5.0"
+kotlin-compile-testing = "1.6.0"
 nyx = "0.2.3"
 
 [plugins]

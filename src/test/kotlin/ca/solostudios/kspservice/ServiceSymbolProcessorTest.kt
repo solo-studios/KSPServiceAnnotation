@@ -8,6 +8,7 @@ import com.tschuchort.compiletesting.kspArgs
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.io.File
@@ -18,6 +19,7 @@ import kotlin.test.assertTrue
 class ServiceSymbolProcessorTest {
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testNoComment(incremental: Boolean) {
         val source = SourceFile.kotlin("CustomCallable.kt", """
             package test
@@ -49,6 +51,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testServiceKotlin(incremental: Boolean) {
         val source = SourceFile.kotlin("CustomCallable.kt", """
             package test
@@ -85,6 +88,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testServiceJava(incremental: Boolean) {
         val source = SourceFile.java("CustomCallable.java", """
             package test;
@@ -124,6 +128,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun fullServiceTest(incremental: Boolean) {
         val sourceFiles = mutableListOf<SourceFile>()
         sourceFiles += SourceFile.kotlin("SomeService.kt", """
@@ -209,6 +214,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testMultiService(incremental: Boolean) {
         val sourceFiles = mutableListOf<SourceFile>()
         sourceFiles += SourceFile.kotlin("SomeService.kt", """
@@ -266,6 +272,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testBadMultiService(incremental: Boolean) {
         val sourceFiles = mutableListOf<SourceFile>()
         sourceFiles += SourceFile.kotlin("NoServices.kt", """
@@ -289,6 +296,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testGenericService(incremental: Boolean) {
         val sourceFiles = mutableListOf<SourceFile>()
         sourceFiles += SourceFile.kotlin("GenericService.kt", """
@@ -332,6 +340,7 @@ class ServiceSymbolProcessorTest {
     
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
+    @ExperimentalCompilerApi
     fun testMissingService(incremental: Boolean) {
         val source = SourceFile.kotlin("GenericServiceProvider.kt", """
             package test
