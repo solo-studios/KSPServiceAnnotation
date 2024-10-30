@@ -19,7 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 withGradle {
-                    sh './gradlew build'
+                    sh './gradlew --rerun-tasks build -x test'
                 }
             }
 
@@ -35,7 +35,7 @@ pipeline {
         stage('Tests') {
             steps {
                 withGradle {
-                    sh './gradlew test'
+                    sh './gradlew --rerun-tasks test'
                 }
             }
 
