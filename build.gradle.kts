@@ -155,7 +155,15 @@ publishing {
 }
 
 signing {
-    useGpgCmd()
+    // Allow specifying the key, key id, and password via environment variables.
+    val signingKey: String? by project
+    val signingKeyId: String? by project
+    val signingPassword: String? by project
+    
+    when {
+        signingKey != null && signingPassword != null -> useInMemoryPgpKeys(signingKey, signingPassword)
+        else                                          -> useGpgCmd()
+    }
     sign(publishing.publications)
 }
 
