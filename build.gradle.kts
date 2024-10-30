@@ -122,20 +122,30 @@ publishing {
     repositories {
         maven {
             name = "Sonatype"
-    
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") // releases repo
-            val snapshotUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") // snapshot repo
-            url = if (isSnapshot) snapshotUrl else releasesUrl
-    
+            
+            val repositoryId: String? by project
+            url = when {
+                repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
+                else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
+            
             credentials(PasswordCredentials::class)
         }
         maven {
-            name = "SoloStudios"
-    
-            val releasesUrl = uri("https://maven.solo-studios.ca/releases/")
-            val snapshotUrl = uri("https://maven.solo-studios.ca/snapshots/")
-            url = if (isSnapshot) snapshotUrl else releasesUrl
-    
+            name = "SoloStudiosReleases"
+            
+            url = uri("https://maven.solo-studios.ca/releases/")
+            
+            credentials(PasswordCredentials::class)
+            authentication { // publishing doesn't work without this for some reason
+                create<BasicAuthentication>("basic")
+            }
+        }
+        maven {
+            name = "SoloStudiosSnapshots"
+            
+            url = uri("https://maven.solo-studios.ca/snapshots/")
+            
             credentials(PasswordCredentials::class)
             authentication { // publishing doesn't work without this for some reason
                 create<BasicAuthentication>("basic")
