@@ -1,170 +1,145 @@
-import org.jetbrains.dokka.gradle.DokkaTask
+@file:Suppress("UnstableApiUsage")
+
+import ca.solostudios.nyx.util.reposiliteMaven
 
 plugins {
     java
     signing
     `java-library`
     `maven-publish`
-    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.axion.release)
+    alias(libs.plugins.nyx)
+    alias(libs.plugins.allure)
 }
 
-group = "ca.solo-studios"
-version = scmVersion.version
+nyx {
+    info {
+        name = "KSP Service Annotation"
+        group = "ca.solo-studios"
+        module = "ksp-service-annotation"
+        version = scmVersion.version
+        description = """
+            A KSP Annotation processor to automatically create the required files in META-INF/services for services.
+        """.trimIndent()
+
+        organizationUrl = "https://solo-studios.ca/"
+        organizationName = "Solo Studios"
+
+        developer {
+            id = "solonovamax"
+            name = "solonovamax"
+            email = "solonovamax@12oclockpoint.com"
+            url = "https://solonovamax.gay"
+        }
+
+        repository.fromGithub("solo-studios", "KSPServiceAnnotation")
+        license.useApachev2()
+    }
+
+    compile {
+        withJavadocJar()
+        withSourcesJar()
+
+        allWarnings = true
+        warningsAsErrors = true
+        distributeLicense = true
+        buildDependsOnJar = true
+        reproducibleBuilds = true
+        jvmTarget = 8
+
+        kotlin {
+            apiVersion = "1.7"
+            languageVersion = "1.7"
+
+            withExplicitApi()
+        }
+    }
+
+    publishing {
+        withSignedPublishing()
+
+        repositories {
+            maven {
+                name = "Sonatype"
+                val repositoryId: String? by project
+                url = when {
+                    repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
+                    else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                }
+                credentials(PasswordCredentials::class)
+            }
+            reposiliteMaven {
+                name = "SoloStudiosReleases"
+                url = uri("https://maven.solo-studios.ca/releases/")
+                credentials(PasswordCredentials::class)
+            }
+            reposiliteMaven {
+                name = "SoloStudiosSnapshots"
+                url = uri("https://maven.solo-studios.ca/snapshots/")
+                credentials(PasswordCredentials::class)
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    
-    withSourcesJar()
-    withJavadocJar()
-}
-
-kotlin {
-    target.compilations.configureEach {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            apiVersion = "1.7"
-            languageVersion = "1.7"
-        }
-    }
-}
-
 dependencies {
     implementation(libs.kotlin.ksp.api)
-    
+
     implementation(libs.bundles.kotlinpoet)
-    
-    
-    testImplementation(libs.bundles.junit)
-    
+
+
+    testImplementation(libs.bundles.kotest)
     testImplementation(libs.kotlin.ksp.base)
-    testImplementation(libs.bundles.kotlin.testing)
     testImplementation(libs.bundles.kotlin.scripting)
+    testImplementation(libs.bundles.kotlin.compile.testing)
 }
 
-tasks.test {
-    // enabled = false
-    useJUnitPlatform()
-}
-
-val dokkaHtml by tasks.getting(DokkaTask::class)
-
-val javadocJar by tasks.getting(Jar::class) {
-    dependsOn(dokkaHtml)
-    archiveClassifier.set("javadoc")
-    from(dokkaHtml.outputDirectory)
-}
-
-val sourcesJar by tasks.getting(Jar::class) {
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
-}
-
-tasks.build {
-    dependsOn(tasks.withType<Jar>())
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-            
-            version = version as String
-            groupId = group as String
-            artifactId = "ksp-service-annotation"
-            
-            pom {
-                val projectOrg = "solo-studios"
-                val projectRepo = "KSPServiceAnnotation"
-                val githubBaseUri = "github.com/$projectOrg/$projectRepo"
-                val githubUrl = "https://$githubBaseUri"
-    
-                name.set("KSP Service Annotation")
-                description.set("A KSP Annotation processor to automatically create the required files in META-INF/services for services.")
-                url.set(githubUrl)
-    
-                inceptionYear.set("2021")
-    
-                licenses {
-                    license {
-                        name.set("Apache License 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0/")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("solonovamax")
-                        name.set("solonovamax")
-                        email.set("solonovamax@12oclockpoint.com")
-                        url.set("https://github.com/solonovamax")
-                    }
-                }
-                issueManagement {
-                    system.set("GitHub")
-                    url.set("$githubUrl/issues")
-                }
-                scm {
-                    connection.set("scm:git:$githubUrl.git")
-                    developerConnection.set("scm:git:ssh://$githubBaseUri.git")
-                    url.set(githubUrl)
-                }
-            }
+allure {
+    version = "2.29.0"
+    adapter {
+        autoconfigure = false
+        autoconfigureListeners = false
+        frameworks {
+            junit5.enabled = false
         }
     }
-    
-    repositories {
-        maven {
-            name = "Sonatype"
-            
-            val repositoryId: String? by project
-            url = when {
-                repositoryId != null -> uri("https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId/")
-                else                 -> uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            }
-            
-            credentials(PasswordCredentials::class)
-        }
-        maven {
-            name = "SoloStudiosReleases"
-            
-            url = uri("https://maven.solo-studios.ca/releases/")
-            
-            credentials(PasswordCredentials::class)
-            authentication { // publishing doesn't work without this for some reason
-                create<BasicAuthentication>("basic")
-            }
-        }
-        maven {
-            name = "SoloStudiosSnapshots"
-            
-            url = uri("https://maven.solo-studios.ca/snapshots/")
-            
-            credentials(PasswordCredentials::class)
-            authentication { // publishing doesn't work without this for some reason
-                create<BasicAuthentication>("basic")
+}
+
+testing.suites {
+    withType<JvmTestSuite>().configureEach {
+        useJUnitJupiter()
+
+        targets.configureEach {
+            testTask {
+                failFast = false
+                finalizedBy(tasks.allureReport)
+
+                systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)
+                systemProperty("gradle.task.name", name)
+                systemProperty("kotest.framework.config.fqn", "ca.solostudios.kspservice.kotest.KotestConfig")
+                systemProperty("kotest.framework.classpath.scanning.config.disable", true)
+                systemProperty("kotest.framework.classpath.scanning.autoscan.disable", true)
+
+                reports {
+                    html.required = false
+                    junitXml.required = false
+                }
             }
         }
     }
 }
 
-signing {
-    // Allow specifying the key, key id, and password via environment variables.
-    val signingKey: String? by project
-    val signingKeyId: String? by project
-    val signingPassword: String? by project
-    
-    when {
-        signingKey != null && signingPassword != null -> useInMemoryPgpKeys(signingKey, signingPassword)
-        else                                          -> useGpgCmd()
+tasks {
+    allureReport {
+        clean = true
     }
-    sign(publishing.publications)
 }
 
 val isSnapshot: Boolean

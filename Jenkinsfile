@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk "Temurin Java 21"
+        jdk 'Temurin Java 21'
     }
 
     triggers {
@@ -25,7 +25,7 @@ pipeline {
 
             post {
                 success {
-                    archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true, onlyIfSuccessful: true
+                    archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true, onlyIfSuccessful: true
 
                     javadoc javadocDir: 'build/dokka/html/', keepAll: true
                 }
@@ -42,6 +42,7 @@ pipeline {
             post {
                 always {
                     junit testResults: 'build/test-results/*/TEST-*.xml'
+                    allure includeProperties: false, jdk: '', results: [[path: 'build/allure-results/']]
                 }
             }
         }
