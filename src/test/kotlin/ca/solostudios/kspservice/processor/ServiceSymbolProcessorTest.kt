@@ -542,4 +542,76 @@ class ServiceSymbolProcessorTest : FunSpec({
             }
         }
     }
+
+    context("an incremental change") {
+        checkAll(Exhaustive.boolean(), Exhaustive.boolean()) { incrementalKsp, ksp2 ->
+            checkAll(if (ksp2) kotlin2Versions else kotlin1Versions) { kotlinVersion ->
+                context("incremental=$incrementalKsp, ksp2=$ksp2, kotlin=$kotlinVersion") {
+                    val compilation = kotlinCompilation {
+                        sources += SourceFile.kotlin(
+                            "CustomCallable.kt",
+                            """
+                                package test
+                                import ca.solostudios.kspservice.annotation.Service
+                                import java.util.concurrent.Callable
+
+                                @Service(Callable::class)
+                                class CustomCallable : Callable<String> {
+                                    override fun call(): String = "Hello world!"
+                                }
+                            """.trimIndent()
+                        )
+
+                        inheritClassPath = true
+                        languageVersion = if (ksp2) "2.0" else kotlinVersion
+                        apiVersion = languageVersion
+
+                        configureKsp(ksp2) {
+                            symbolProcessorProviders += KSPServiceProcessorProvider()
+                            incremental = incrementalKsp
+                        }
+                    }
+
+                    compilation.compile()
+
+                    compilation.sources += SourceFile.kotlin(
+                        "CustomCallable2.kt",
+                        """
+                            package test
+                            import ca.solostudios.kspservice.annotation.Service
+                            import java.util.concurrent.Callable
+
+                            @Service(Callable::class)
+                            class CustomCallable2 : Callable<String> {
+                                override fun call(): String = "Hello world!"
+                            }
+                        """.trimIndent()
+                    )
+
+                    test("should not error") {
+                        val result = shouldNotThrowAny { compilation.compile() }
+
+                        result.shouldBeSuccess()
+                    }
+
+                    test("should produce correct files") {
+                        shouldNotThrowAny { compilation.compile() }
+
+                        val generatedSourcesDir = compilation.kspSourcesDir
+                        val generatedServicesDir = generatedSourcesDir.resolve("resources/META-INF/services")
+                        val callableServiceFile = generatedServicesDir.resolve("java.util.concurrent.Callable")
+
+                        generatedServicesDir.shouldExist()
+                        generatedServicesDir.shouldBeADirectory()
+                        generatedServicesDir shouldContainFile "java.util.concurrent.Callable"
+
+                        callableServiceFile.shouldExist()
+                        callableServiceFile.shouldBeAFile()
+                        callableServiceFile.readText() shouldContain "test.CustomCallable"
+                        callableServiceFile.readText() shouldContain "test.CustomCallable2"
+                    }
+                }
+            }
+        }
+    }
 })
