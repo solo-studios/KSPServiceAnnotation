@@ -120,6 +120,7 @@ testing.suites {
             testTask {
                 maxHeapSize = "4G"
                 failFast = false
+                forkEvery = 1
                 finalizedBy(tasks.allureReport)
 
                 systemProperty("gradle.build.dir", layout.buildDirectory.get().asFile)

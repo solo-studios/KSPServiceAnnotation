@@ -11,14 +11,14 @@ import io.kotest.extensions.htmlreporter.HtmlReporter
 import io.kotest.extensions.junitxml.JunitXmlReporter
 
 class KotestConfig : AbstractProjectConfig() {
-    override val parallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceIn(0, 4)
+    override val parallelism = 1
 
     override val testCaseOrder = TestCaseOrder.Sequential
     override val duplicateTestNameMode = DuplicateTestNameMode.Error
     override val testNameCase = TestNameCase.InitialLowercase
     override val specExecutionOrder = SpecExecutionOrder.Lexicographic
 
-    override val isolationMode = IsolationMode.InstancePerTest
+    override val isolationMode = IsolationMode.InstancePerLeaf
 
     override fun extensions() = listOf(
         AllureTestReporter(

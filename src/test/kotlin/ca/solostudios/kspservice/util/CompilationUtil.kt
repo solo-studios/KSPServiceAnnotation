@@ -7,11 +7,20 @@ import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldNot
+import io.kotest.property.Exhaustive
+import io.kotest.property.exhaustive.of
+import io.kotest.property.exhaustive.plus
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+
+val ksp1LanguageVersions = Exhaustive.of("1.7", "1.8", "1.9")
+
+val ksp2LanguageVersions = ksp1LanguageVersions + Exhaustive.of("2.0")
 
 @ExperimentalCompilerApi
 fun kotlinCompilation(block: KotlinCompilation.() -> Unit): KotlinCompilation {
-    return KotlinCompilation().apply(block)
+    return KotlinCompilation().apply {
+        verbose = false
+    }.apply(block)
 }
 
 @ExperimentalCompilerApi
