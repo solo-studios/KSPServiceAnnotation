@@ -74,7 +74,13 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                 }
 
                 if (serviceInterfaces.isEmpty()) {
-                    logger.error("No service interfaces specified by this element", argument)
+                    logger.error(
+                        """
+                            No service interfaces specified by @Service annotation!
+                            You can provide them in annotation parameters: @Service(YourService::class)
+                        """.trimIndent(),
+                        argument
+                    )
                 }
 
                 processServiceInterfaces(serviceClassDeclaration, serviceInterfaces)
