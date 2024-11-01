@@ -51,6 +51,8 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
             return emptyList()
         }
 
+        val deferredDeclarations = mutableListOf<KSClassDeclaration>()
+
         resolver.getSymbolsWithAnnotation(SERVICE_ANNOTATION_NAME)
             .filterIsInstance<KSClassDeclaration>()
             .forEach { serviceClassDeclaration ->
@@ -109,29 +111,40 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                     )
                 }
 
-                processServiceInterfaces(serviceClassDeclaration, serviceInterfaces)
+                val deferred = processServiceInterfaces(serviceClassDeclaration, serviceInterfaces)
+                if (deferred)
+                    deferredDeclarations += serviceClassDeclaration
             }
 
         generateConfigFiles()
 
-        return emptyList()
+        return deferredDeclarations
     }
 
-    private fun processServiceInterfaces(serviceImplementation: KSClassDeclaration, serviceInterfaces: List<KSType>) {
+    private fun processServiceInterfaces(serviceImplementation: KSClassDeclaration, serviceInterfaces: List<KSType>): Boolean {
         for (serviceInterface in serviceInterfaces) {
             val serviceDeclaration = serviceInterface.declaration.closestClassDeclaration()
 
-            when {
-                serviceDeclaration == null                                       -> {
-                    logger.error(
-                        """
-                            Cannot locate the class declaration for ${serviceInterface.declaration.simpleName}.
-                        """.trimIndent(),
-                        serviceInterface.declaration
-                    )
+            if (serviceInterface.isError)
+                return true
+
+            if (serviceDeclaration == null) {
+                logger.error(
+                    """
+                        Cannot locate the class declaration for ${serviceInterface.declaration.simpleName}.
+                    """.trimIndent(),
+                    serviceInterface.declaration
+                )
+            } else when (serviceImplementation.failsServiceValidation(serviceInterface)) {
+                ValidationResult.VALID    -> {
+                    val serviceImplementors = services.getOrPut(serviceDeclaration.toBinaryName()) { mutableSetOf() }
+
+                    serviceImplementors += serviceImplementation.toBinaryName()
+
+                    serviceFiles[serviceImplementation.toBinaryName()] = serviceImplementation.containingFile!! // should never be null
                 }
 
-                serviceImplementation.failsServiceVerification(serviceInterface) -> {
+                ValidationResult.INVALID  -> {
                     logger.error(
                         """
                             Classes annotated with @Service must implement the service classe(s)/interface(s).
@@ -141,16 +154,11 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                     )
                 }
 
-                else                                                             -> {
-                    val serviceImplementors = services[serviceDeclaration.toBinaryName()]
-                        ?: mutableSetOf<String>().also { services[serviceDeclaration.toBinaryName()] = it }
-
-                    serviceImplementors.add(serviceImplementation.toBinaryName())
-
-                    serviceFiles[serviceImplementation.toBinaryName()] = serviceImplementation.containingFile!!
-                }
+                ValidationResult.DEFERRED -> return true
             }
         }
+
+        return false
     }
 
     private fun generateConfigFiles() {
@@ -207,11 +215,19 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
             logging(message())
     }
 
-    private fun KSClassDeclaration.failsServiceVerification(serviceType: KSType): Boolean {
-        return if (verify)
-            this.getAllSuperTypes().any { it.isAssignableFrom(serviceType) }
-        else
-            false
+    private fun KSClassDeclaration.failsServiceValidation(serviceType: KSType): ValidationResult {
+        if (!verify)
+            return ValidationResult.VALID
+
+        val supertypes = getAllSuperTypes()
+
+        if (supertypes.any { it.isAssignableFrom(serviceType) })
+            ValidationResult.VALID
+
+        if (supertypes.any { it.isError })
+            return ValidationResult.DEFERRED
+
+        return ValidationResult.INVALID
     }
 
     private fun KSClassDeclaration.toBinaryName(): String = toClassName().reflectionName()
@@ -226,6 +242,12 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
 
         val simpleNames = typesString.split(".")
         return ClassName(pkgName, simpleNames)
+    }
+
+    private enum class ValidationResult {
+        VALID,
+        INVALID,
+        DEFERRED,
     }
 
     companion object {
