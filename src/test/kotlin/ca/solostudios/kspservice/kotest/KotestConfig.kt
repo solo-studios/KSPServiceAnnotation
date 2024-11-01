@@ -11,7 +11,7 @@ import io.kotest.extensions.htmlreporter.HtmlReporter
 import io.kotest.extensions.junitxml.JunitXmlReporter
 
 class KotestConfig : AbstractProjectConfig() {
-    override val parallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+    override val parallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceIn(0, 4)
 
     override val testCaseOrder = TestCaseOrder.Sequential
     override val duplicateTestNameMode = DuplicateTestNameMode.Error

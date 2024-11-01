@@ -118,6 +118,7 @@ testing.suites {
 
         targets.configureEach {
             testTask {
+                maxHeapSize = "4G"
                 failFast = false
                 finalizedBy(tasks.allureReport)
 
