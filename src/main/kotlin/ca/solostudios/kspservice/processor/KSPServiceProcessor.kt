@@ -41,7 +41,13 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
             ?.asType(emptyList())
 
         if (serviceType == null) {
-            logger.error("@Service type was not found on the classpath.")
+            logger.error(
+                """
+                    The @Service annotation could not be found.
+                    Expected an annotation with the name $SERVICE_ANNOTATION_NAME.
+                    Please add ksp-service-annotation to the compile classpath.
+                """.trimIndent()
+            )
             return emptyList()
         }
 
@@ -51,7 +57,15 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                 val annotation = serviceClassDeclaration.annotations.find { it.annotationType.resolve() == serviceType }
 
                 if (annotation == null) {
-                    logger.error("@Service annotation not found", serviceClassDeclaration)
+                    logger.error(
+                        """
+                            Could not locate the @Service annotation on the element ${serviceClassDeclaration.simpleName.asString()}.
+                            Why is it being processed?
+
+                            Please report this error.
+                        """.trimIndent(),
+                        serviceClassDeclaration
+                    )
                     return@forEach
                 }
 
@@ -61,7 +75,13 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                 val argumentValue = argument?.value
 
                 if (argumentValue == null) {
-                    logger.error("@Service value was null when it should not be.", argument)
+                    logger.error(
+                        """
+                            The 'value' property was found in the @Service annotation, but was null.
+                            Expected the 'value' property to be non-null.
+                        """.trimIndent(),
+                        argument
+                    )
                     return@forEach
                 }
 
@@ -69,7 +89,13 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                     @Suppress("UNCHECKED_CAST")
                     argumentValue as? List<KSType> ?: listOf(argumentValue as KSType)
                 } catch (e: ClassCastException) {
-                    logger.error("The 'value' property was found in the annotation, but it is the wrong type.", argument)
+                    logger.error(
+                        """
+                            The 'value' property was found in the @Service annotation, but it is the wrong type.
+                            Expected the 'value' property to be of type KClass<*>.
+                        """.trimIndent(),
+                        argument
+                    )
                     return@forEach
                 }
 
@@ -97,16 +123,22 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
 
             when {
                 serviceDeclaration == null                                       -> {
-                    logger.error("The declaration of the inherited service is null when it should not be.", serviceInterface.declaration)
+                    logger.error(
+                        """
+                            Cannot locate the class declaration for ${serviceInterface.declaration.simpleName}.
+                        """.trimIndent(),
+                        serviceInterface.declaration
+                    )
                 }
 
                 serviceImplementation.failsServiceVerification(serviceInterface) -> {
-                    logger.error(buildString {
-                        append("Classes annotated with @Service must implement the appropriate service interface. ")
-                        append(serviceImplementation.qualifiedName)
-                        append(" does not implement ")
-                        append(serviceDeclaration.qualifiedName)
-                    }, serviceImplementation)
+                    logger.error(
+                        """
+                            Classes annotated with @Service must implement the service classe(s)/interface(s).
+                            ${serviceImplementation.simpleName} does not implement ${serviceDeclaration.qualifiedName}
+                        """.trimIndent(),
+                        serviceImplementation
+                    )
                 }
 
                 else                                                             -> {
@@ -125,24 +157,17 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
         for (serviceInterface in services.keys) {
             val resourceFile = "META-INF/services/$serviceInterface"
 
-            logger.verbose { "Working on resource file $resourceFile" }
+            logger.verbose { "Writing service file for $serviceInterface: $resourceFile" }
 
             try {
                 val serviceImplementors = services[serviceInterface]!!
                 val serviceFiles = serviceImplementors.mapNotNull { serviceFiles[it] }
 
-                if (serviceImplementors.isEmpty()) {
-                    logger.verbose { "Skipping writing '$resourceFile', as service list is empty" }
-                    return
-                }
+                if (serviceImplementors.isEmpty())
+                    return logger.verbose { "Skipping writing '$resourceFile', as there are no services for $serviceInterface" }
 
                 logger.verbose {
-                    val joinedImplementors = serviceImplementors.joinToString(
-                        separator = ",",
-                        prefix = "(",
-                        postfix = ")"
-                    )
-
+                    val joinedImplementors = serviceImplementors.joinToString(separator = ",", prefix = "(", postfix = ")")
                     "Appending services $joinedImplementors to service file '$resourceFile'."
                 }
 
@@ -164,8 +189,13 @@ internal class KSPServiceProcessor(environment: SymbolProcessorEnvironment) : Sy
                     }
 
                 logger.verbose { "Successfully wrote to $resourceFile" }
-            } catch (e: IOException) {
-                logger.error("Unable to write to $resourceFile: $e")
+            } catch (exception: IOException) {
+                logger.error(
+                    """
+                        Unable to write to $resourceFile:
+                        $exception
+                    """.trimIndent()
+                )
             }
         }
 
